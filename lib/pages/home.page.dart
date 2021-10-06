@@ -10,6 +10,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Color _color = Colors.deepPurple;
   var _gasController = new MoneyMaskedTextController();
   var _alcController = new MoneyMaskedTextController();
   var _busy = false;
@@ -20,18 +21,23 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: ListView(
-        children: <Widget>[
-          Logo(),
-          _completed
-              ? Success(result: _resultText, reset: () {})
-              : SubmitForm(
-                  gasCTRL: _gasController,
-                  alcCTRL: _alcController,
-                  busy: _busy,
-                  submitFunc: calculate)
-        ],
-      ),
+      body: AnimatedContainer(
+          duration: Duration(
+            milliseconds: 1200,
+          ),
+          color: _color,
+          child: ListView(
+            children: <Widget>[
+              Logo(),
+              _completed
+                  ? Success(result: _resultText, reset: reset)
+                  : SubmitForm(
+                      gasCTRL: _gasController,
+                      alcCTRL: _alcController,
+                      busy: _busy,
+                      submitFunc: calculate)
+            ],
+          )),
     );
   }
 
@@ -45,12 +51,13 @@ class _HomePageState extends State<HomePage> {
     double res = alcool / gasolina;
 
     setState(() {
+      _color = Colors.deepPurpleAccent;
       _completed = false;
       _busy = true;
     });
 
     return new Future.delayed(
-        const Duration(seconds: 3),
+        const Duration(seconds: 1),
         () => {
               setState(() {
                 if (res >= 0.7) {
@@ -62,5 +69,15 @@ class _HomePageState extends State<HomePage> {
                 _completed = true;
               })
             });
+  }
+
+  reset() {
+    setState(() {
+      _alcController = new MoneyMaskedTextController();
+      _gasController = new MoneyMaskedTextController();
+      _completed = false;
+      _busy = false;
+      _color = Colors.deepPurple;
+    });
   }
 }
